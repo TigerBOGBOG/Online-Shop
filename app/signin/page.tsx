@@ -5,7 +5,7 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
 export default function SignIn() {
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState('')
@@ -19,13 +19,13 @@ export default function SignIn() {
     try {
       const result = await signIn('credentials', {
         redirect: false,
-        email,
+        username,   // ← เปลี่ยนจาก email
         password,
       })
 
       if (!result) return
       if (result.error) {
-        setError('อีเมลหรือรหัสผ่านไม่ถูกต้อง')
+        setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')
       } else {
         router.push('/profile')
       }
@@ -41,11 +41,8 @@ export default function SignIn() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
 
-        {/* Logo / Brand */}
         <div className="mb-8">
-          <h1 className="text-xl font-semibold text-gray-900 mb-1">
-            ยินดีต้อนรับกลับ
-          </h1>
+          <h1 className="text-xl font-semibold text-gray-900 mb-1">ยินดีต้อนรับกลับ</h1>
           <p className="text-sm text-gray-400">
             ยังไม่มีบัญชี?{' '}
             <a href="/signup" className="text-gray-900 font-medium hover:underline underline-offset-2">
@@ -56,24 +53,24 @@ export default function SignIn() {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
 
-          {/* Email */}
+          {/* Username */}
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="email" className="text-xs font-medium text-gray-500">
-              อีเมล
+            <label htmlFor="username" className="text-xs font-medium text-gray-500">
+              ชื่อผู้ใช้
             </label>
             <input
-              id="email"
-              type="email"
-              value={email}
-              placeholder="you@example.com"
-              onChange={(e) => setEmail(e.target.value)}
+              id="username"
+              type="text"             // ← เปลี่ยนจาก email
+              value={username}
+              placeholder="your_username"
+              onChange={(e) => setUsername(e.target.value)}
               required
-              autoComplete="email"
+              autoComplete="username"
               className="w-full border border-gray-200 rounded-lg px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-300 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-100 transition-all"
             />
           </div>
 
-          {/* Password */}
+          {/* Password — เหมือนเดิมทุกอย่าง */}
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="text-xs font-medium text-gray-500">
@@ -105,14 +102,12 @@ export default function SignIn() {
             </div>
           </div>
 
-          {/* Error */}
           {error && (
             <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
               {error}
             </p>
           )}
 
-          {/* Submit */}
           <button
             type="submit"
             disabled={loading}
@@ -122,14 +117,12 @@ export default function SignIn() {
           </button>
         </form>
 
-        {/* Divider */}
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-gray-100" />
           <span className="text-xs text-gray-300">หรือ</span>
           <div className="flex-1 h-px bg-gray-100" />
         </div>
 
-        {/* Google */}
         <button
           type="button"
           onClick={() => signIn('google')}

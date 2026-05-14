@@ -37,6 +37,9 @@ const strengthLabels: Record<PasswordStrength, string> = {
 };
 
 export default function SignupPage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(false);
   const [form, setForm] = useState<FormData>({
     name: "",
     username: "",
@@ -57,10 +60,50 @@ export default function SignupPage() {
     }));
   };
 
-  const handleSubmit = (e: React.MouseEvent) => {
-    e.preventDefault();
-    console.log("Form submitted:", form);
-  };
+  const handleSubmit = async (e: React.MouseEvent) => {
+  e.preventDefault();
+  setError("");
+
+  if (!form.agree) {
+    setError("กรุณายอมรับข้อกำหนดการใช้งานก่อน");
+    return;
+  }
+
+  if (form.username.length < 6) {
+    setError("Username ต้องมีอย่างน้อย 6 ตัวอักษร");
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const res = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: form.name,
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setError(data.message || "เกิดข้อผิดพลาด กรุณาลองใหม่");
+      return;
+    }
+
+      setSuccess(true);
+      setTimeout(() => {
+        window.location.href = "/signin";
+      }, 2000);
+    } catch (err) {
+      setError("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้");
+    } finally {
+      setLoading(false);
+    }
+};
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
@@ -195,11 +238,27 @@ export default function SignupPage() {
 
           {/* Submit */}
           <button
+            type="button"
             onClick={handleSubmit}
-            className="w-full py-2.5 bg-gray-900 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+            disabled={loading}
+            className="w-full py-2.5 bg-gray-900 hover:bg-gray-700 disabled:bg-gray-400 text-white text-sm font-medium rounded-lg transition-colors"
           >
-            สร้างบัญชี →
-          </button>
+            {loading ? "กำลังสร้างบัญชี..." : "สร้างบัญชี →"}
+        </button>
+            {error && (
+            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-red-50 border border-red-100 rounded-lg text-xs text-red-500">
+              <span>⚠</span>
+              <span>{error}</span>
+            </div>
+          )}
+
+          {/* Success */}
+          {success && (
+            <div className="flex items-center gap-2 px-3.5 py-2.5 bg-green-50 border border-green-100 rounded-lg text-xs text-green-600">
+              <span>✓</span>
+              <span>สร้างบัญชีสำเร็จ! กำลังพาไปหน้าเข้าสู่ระบบ...</span>
+            </div>
+          )}
         </form>
 
         {/* Divider */}
@@ -210,7 +269,7 @@ export default function SignupPage() {
         </div>
 
         {/* Google */}
-        <button
+        {/* <button
           type="button"
           className="w-full flex items-center justify-center gap-2.5 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors"
         >
@@ -221,7 +280,12 @@ export default function SignupPage() {
             <path fill="#FBBC05" d="M5.277 14.268A7.12 7.12 0 0 1 4.909 12c0-.782.125-1.533.357-2.235L1.24 6.65A11.934 11.934 0 0 0 0 12c0 1.92.445 3.73 1.237 5.335l4.04-3.067z"/>
           </svg>
           สมัครด้วย Google
-        </button>
+        </button> */}
+        {/* Error */}
+          
+
+
+          
       </div>
     </div>
   );
