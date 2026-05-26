@@ -27,7 +27,7 @@ export default function SignIn() {
       if (result.error) {
         setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง')
       } else {
-        router.push('/profile')
+        router.push('/')
       }
     } catch (err) {
       console.error('error', err)
